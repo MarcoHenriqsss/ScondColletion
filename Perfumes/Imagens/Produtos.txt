@@ -1,8 +1,8 @@
 Nome: Best Girl
 Descricao: Perfume feminino marcante, elegante e sofisticado.
-Preco: 129.90
+Preco: 0
 Imagem: Bestgirl.jpeg
-Categoria: Feminino
+Categoria: Masculino
 Estoque: 3
 
 Nome: 412 VIP
