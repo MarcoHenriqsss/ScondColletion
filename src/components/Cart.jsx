@@ -1,10 +1,11 @@
+import React from "react";
+
 function Cart({
   carrinho,
   fechar,
   removerProduto,
   alterarQuantidade,
 }) {
-
   const total = carrinho.reduce(
     (soma, item) =>
       soma + item.preco * item.quantidade,
@@ -18,37 +19,49 @@ function Cart({
   );
 
   function finalizarWhatsApp() {
-
     if (carrinho.length === 0) return;
 
     const numeroWhatsApp = "5562993265596";
 
     let mensagem =
-      "Olá! Gostaria de fazer um pedido na Scond Collection.%0A%0A";
+      "Olá! Gostaria de fazer um pedido na Scond Collection.\n\n";
 
     carrinho.forEach((item) => {
+      const subtotal =
+        item.preco * item.quantidade;
+
       mensagem +=
-        `• ${item.nome} - ${item.quantidade}x - R$ ${(item.preco * item.quantidade)
+        `• ${item.nome} - ${item.quantidade}x - R$ ${subtotal
           .toFixed(2)
-          .replace(".", ",")}%0A`;
+          .replace(".", ",")}\n`;
     });
 
     mensagem +=
-      `%0A*Total: R$ ${total.toFixed(2).replace(".", ",")}*`;
+      `\n*Total: R$ ${total
+        .toFixed(2)
+        .replace(".", ",")}*`;
 
     mensagem +=
-      "%0A%0AGostaria de receber informações sobre pagamento e entrega.";
+      "\n\nGostaria de receber informações sobre pagamento e entrega.";
+
+    const mensagemCodificada =
+      encodeURIComponent(mensagem);
 
     window.open(
-      `https://wa.me/${numeroWhatsApp}?text=${mensagem}`,
+      `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`,
       "_blank"
     );
   }
 
   return (
-    <div className="cart-overlay">
-
-      <aside className="cart">
+    <div
+      className="cart-overlay"
+      onClick={fechar}
+    >
+      <aside
+        className="cart"
+        onClick={(e) => e.stopPropagation()}
+      >
 
         <div className="cart-header">
 
@@ -57,7 +70,11 @@ function Cart({
             <h2>Carrinho</h2>
           </div>
 
-          <button onClick={fechar}>
+          <button
+            type="button"
+            onClick={fechar}
+            aria-label="Fechar carrinho"
+          >
             ×
           </button>
 
@@ -66,6 +83,7 @@ function Cart({
         {carrinho.length === 0 ? (
 
           <div className="empty-cart">
+
             <div>🛍</div>
 
             <h3>
@@ -77,9 +95,13 @@ function Cart({
               para continuar.
             </p>
 
-            <button onClick={fechar}>
+            <button
+              type="button"
+              onClick={fechar}
+            >
               CONTINUAR COMPRANDO
             </button>
+
           </div>
 
         ) : (
@@ -89,7 +111,10 @@ function Cart({
 
               {carrinho.map((item) => (
 
-                <div className="cart-item" key={item.id}>
+                <div
+                  className="cart-item"
+                  key={item.id}
+                >
 
                   <img
                     src={`/Perfumes/Imagens/${item.imagem}`}
@@ -98,7 +123,9 @@ function Cart({
 
                   <div className="cart-item-info">
 
-                    <h3>{item.nome}</h3>
+                    <h3>
+                      {item.nome}
+                    </h3>
 
                     <span>
                       R$ {item.preco
@@ -109,6 +136,7 @@ function Cart({
                     <div className="quantity">
 
                       <button
+                        type="button"
                         onClick={() =>
                           alterarQuantidade(
                             item.id,
@@ -124,6 +152,7 @@ function Cart({
                       </span>
 
                       <button
+                        type="button"
                         onClick={() =>
                           alterarQuantidade(
                             item.id,
@@ -137,6 +166,7 @@ function Cart({
                     </div>
 
                     <button
+                      type="button"
                       className="remove-item"
                       onClick={() =>
                         removerProduto(item.id)
@@ -156,6 +186,7 @@ function Cart({
             <div className="cart-footer">
 
               <div className="cart-total">
+
                 <span>
                   {quantidade} item(ns)
                 </span>
@@ -165,9 +196,11 @@ function Cart({
                     .toFixed(2)
                     .replace(".", ",")}
                 </strong>
+
               </div>
 
               <button
+                type="button"
                 className="whatsapp-button"
                 onClick={finalizarWhatsApp}
               >
@@ -186,7 +219,6 @@ function Cart({
         )}
 
       </aside>
-
     </div>
   );
 }
