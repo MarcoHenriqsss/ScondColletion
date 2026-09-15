@@ -2,6 +2,7 @@ from pathlib import Path
 import re
 import shutil
 import unicodedata
+import json
 
 
 # =========================
@@ -14,11 +15,19 @@ ARQUIVO_TXT = PASTA_IMAGENS / "Produtos.txt"
 ARQUIVO_JS = Path("src/data/produtos.js")
 
 
-# Cria a pasta pública se não existir
-PASTA_PUBLICA.mkdir(parents=True, exist_ok=True)
+# =========================
+# CRIAR PASTAS
+# =========================
 
-# Cria a pasta dos dados se não existir
-ARQUIVO_JS.parent.mkdir(parents=True, exist_ok=True)
+PASTA_PUBLICA.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+ARQUIVO_JS.parent.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
 
 # =========================
@@ -26,11 +35,24 @@ ARQUIVO_JS.parent.mkdir(parents=True, exist_ok=True)
 # =========================
 
 def gerar_id(nome):
-    texto = unicodedata.normalize("NFKD", nome)
-    texto = texto.encode("ascii", "ignore").decode("ascii")
+    texto = unicodedata.normalize(
+        "NFKD",
+        nome
+    )
+
+    texto = texto.encode(
+        "ascii",
+        "ignore"
+    ).decode("ascii")
+
     texto = texto.lower()
 
-    texto = re.sub(r"[^a-z0-9]+", "-", texto)
+    texto = re.sub(
+        r"[^a-z0-9]+",
+        "-",
+        texto
+    )
+
     texto = texto.strip("-")
 
     return texto
@@ -38,40 +60,78 @@ def gerar_id(nome):
 
 def converter_preco(valor):
     valor = valor.strip()
-    valor = valor.replace("R$", "").strip()
+
+    valor = valor.replace(
+        "R$",
+        ""
+    ).strip()
+
+    # =========================
+    # PRODUTO SEM PREÇO
+    # =========================
+
+    if valor.lower() in [
+        "confira",
+        "consulte",
+        "sob consulta"
+    ]:
+        return None
+
+    # =========================
+    # CONVERSÃO DO PREÇO
+    # =========================
 
     # Aceita:
+    #
     # 129.90
     # 129,90
     # 1.299,90
 
     if "," in valor:
-        valor = valor.replace(".", "")
-        valor = valor.replace(",", ".")
+
+        valor = valor.replace(
+            ".",
+            ""
+        )
+
+        valor = valor.replace(
+            ",",
+            "."
+        )
 
     return float(valor)
 
 
 # =========================
-# LEITURA DO TXT
+# VERIFICAR PRODUTOS.TXT
 # =========================
 
 if not ARQUIVO_TXT.exists():
-    print("ERRO: Produtos.txt não encontrado.")
+
+    print(
+        "ERRO: Produtos.txt não encontrado."
+    )
+
     exit()
 
+
+# =========================
+# LER PRODUTOS.TXT
+# =========================
 
 texto = ARQUIVO_TXT.read_text(
     encoding="utf-8"
 )
 
-blocos = texto.split("\n\n")
+blocos = texto.split(
+    "\n\n"
+)
 
 produtos = []
 
 
 # =========================
-# PROCESSAMENTO
+# PROCESSAR PRODUTOS
 # =========================
 
 for bloco in blocos:
@@ -88,9 +148,14 @@ for bloco in blocos:
         if ":" not in linha:
             continue
 
-        chave, valor = linha.split(":", 1)
+        chave, valor = linha.split(
+            ":",
+            1
+        )
 
         dados[chave.strip()] = valor.strip()
+
+    # Produto precisa ter nome
 
     if "Nome" not in dados:
         continue
@@ -98,20 +163,44 @@ for bloco in blocos:
     nome = dados["Nome"]
 
     produto = {
+
         "id": gerar_id(nome),
+
         "nome": nome,
-        "descricao": dados.get("Descricao", ""),
-        "preco": converter_preco(
-            dados.get("Preco", "0")
+
+        "descricao": dados.get(
+            "Descricao",
+            ""
         ),
-        "imagem": dados.get("Imagem", ""),
-        "categoria": dados.get("Categoria", ""),
+
+        "preco": converter_preco(
+            dados.get(
+                "Preco",
+                "0"
+            )
+        ),
+
+        "imagem": dados.get(
+            "Imagem",
+            ""
+        ),
+
+        "categoria": dados.get(
+            "Categoria",
+            ""
+        ),
+
         "estoque": int(
-            dados.get("Estoque", "0")
+            dados.get(
+                "Estoque",
+                "0"
+            )
         )
     }
 
-    produtos.append(produto)
+    produtos.append(
+        produto
+    )
 
 
 # =========================
@@ -119,10 +208,17 @@ for bloco in blocos:
 # =========================
 
 produtos.sort(
-    key=lambda produto: unicodedata.normalize(
-        "NFKD",
-        produto["nome"]
-    ).encode("ascii", "ignore").decode("ascii").lower()
+    key=lambda produto:
+        unicodedata.normalize(
+            "NFKD",
+            produto["nome"]
+        )
+        .encode(
+            "ascii",
+            "ignore"
+        )
+        .decode("ascii")
+        .lower()
 )
 
 
@@ -134,8 +230,21 @@ for produto in produtos:
 
     nome_imagem = produto["imagem"]
 
-    origem = PASTA_IMAGENS / nome_imagem
-    destino = PASTA_PUBLICA / nome_imagem
+    # Se não tiver imagem,
+    # não tenta copiar
+
+    if not nome_imagem:
+        continue
+
+    origem = (
+        PASTA_IMAGENS /
+        nome_imagem
+    )
+
+    destino = (
+        PASTA_PUBLICA /
+        nome_imagem
+    )
 
     if origem.exists():
 
@@ -151,7 +260,8 @@ for produto in produtos:
     else:
 
         print(
-            f"AVISO: imagem não encontrada: {nome_imagem}"
+            f"AVISO: imagem não encontrada: "
+            f"{nome_imagem}"
         )
 
 
@@ -159,9 +269,15 @@ for produto in produtos:
 # GERAR JAVASCRIPT
 # =========================
 
-conteudo = """const produtos = """
+conteudo = (
+    "const produtos = "
+)
 
-conteudo += repr(produtos)
+conteudo += json.dumps(
+    produtos,
+    ensure_ascii=False,
+    indent=2
+)
 
 conteudo += """
 
@@ -180,21 +296,57 @@ ARQUIVO_JS.write_text(
 # =========================
 
 print()
-print("==============================")
-print(" PRODUTOS GERADOS")
-print("==============================")
+
+print(
+    "=============================="
+)
+
+print(
+    " PRODUTOS GERADOS"
+)
+
+print(
+    "=============================="
+)
+
 print()
+
 
 for produto in produtos:
 
+    if produto["preco"] is None:
+
+        preco = "Confira!"
+
+    else:
+
+        preco = (
+            f'R$ '
+            f'{produto["preco"]:.2f}'
+        )
+
     print(
         f'{produto["nome"]} - '
-        f'R$ {produto["preco"]:.2f} - '
+        f'{preco} - '
         f'{produto["imagem"]}'
     )
 
+
 print()
-print(f"Total de produtos: {len(produtos)}")
+
+print(
+    f"Total de produtos: "
+    f"{len(produtos)}"
+)
+
 print()
-print("Arquivo gerado:")
-print(ARQUIVO_JS)
+
+print(
+    "Arquivo gerado:"
+)
+
+print(
+    ARQUIVO_JS
+)
+
+print()

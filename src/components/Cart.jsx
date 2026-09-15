@@ -206,6 +206,13 @@ function Cart({
               >
                 FINALIZAR PELO WHATSAPP
               </button>
+              <button
+  type="button"
+  className="continue-shopping-button"
+  onClick={fechar}
+>
+  CONTINUAR COMPRANDO
+</button>
 
               <small>
                 O pedido será enviado pelo WhatsApp

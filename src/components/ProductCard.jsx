@@ -1,7 +1,23 @@
 import React from "react";
 
-function ProductCard({ produto, adicionarCarrinho, abrirProduto }) {
-  const disponivel = produto.estoque > 0;
+function ProductCard({
+  produto,
+  adicionarAoCarrinho,
+  abrirProduto,
+}) {
+  const temPreco =
+    produto.preco !== null && produto.preco > 0;
+
+  function consultarWhatsApp() {
+    const mensagem = encodeURIComponent(
+      `Olá! Gostaria de consultar o preço e a disponibilidade do perfume ${produto.nome}.`
+    );
+
+    window.open(
+      `https://wa.me/5562993265596?text=${mensagem}`,
+      "_blank"
+    );
+  }
 
   return (
     <article className="product-card">
@@ -14,18 +30,6 @@ function ProductCard({ produto, adicionarCarrinho, abrirProduto }) {
           src={`/Perfumes/Imagens/${produto.imagem}`}
           alt={produto.nome}
         />
-
-        {produto.estoque <= 3 && produto.estoque > 0 && (
-          <span className="stock-badge">
-            Últimas unidades
-          </span>
-        )}
-
-        {produto.estoque === 0 && (
-          <span className="sold-out">
-            ESGOTADO
-          </span>
-        )}
       </div>
 
       <div className="product-info">
@@ -34,7 +38,9 @@ function ProductCard({ produto, adicionarCarrinho, abrirProduto }) {
           {produto.categoria}
         </span>
 
-        <h3>{produto.nome}</h3>
+        <h3>
+          {produto.nome}
+        </h3>
 
         <p className="product-description">
           {produto.descricao}
@@ -42,16 +48,35 @@ function ProductCard({ produto, adicionarCarrinho, abrirProduto }) {
 
         <div className="product-bottom">
 
-          <strong>
-            R$ {produto.preco.toFixed(2).replace(".", ",")}
-          </strong>
+          {temPreco ? (
+            <strong>
+              R$ {produto.preco
+                .toFixed(2)
+                .replace(".", ",")}
+            </strong>
+          ) : (
+            <strong>
+              Confira!
+            </strong>
+          )}
 
-          <button
-            disabled={!disponivel}
-            onClick={() => adicionarCarrinho(produto)}
-          >
-            {disponivel ? "Adicionar" : "Esgotado"}
-          </button>
+          {temPreco ? (
+            <button
+              type="button"
+              onClick={() =>
+                adicionarAoCarrinho(produto)
+              }
+            >
+              Adicionar ao carrinho
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={consultarWhatsApp}
+            >
+              Consultar no WhatsApp
+            </button>
+          )}
 
         </div>
 

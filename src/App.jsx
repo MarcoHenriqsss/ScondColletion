@@ -25,7 +25,19 @@ function App() {
     useState(null);
 
 
+  // ==========================================
+  // ADICIONAR PRODUTO AO CARRINHO
+  // ==========================================
+
   function adicionarCarrinho(produto) {
+
+    // Produto sem preço não entra no carrinho
+    if (
+      produto.preco === null ||
+      produto.preco <= 0
+    ) {
+      return;
+    }
 
     setCarrinho((carrinhoAtual) => {
 
@@ -33,23 +45,36 @@ function App() {
         (item) => item.id === produto.id
       );
 
+      // Se o produto já existe no carrinho
       if (existe) {
 
-        return carrinhoAtual.map((item) =>
-          item.id === produto.id
-            ? {
-                ...item,
-                quantidade:
-                  Math.min(
-                    item.quantidade + 1,
-                    produto.estoque
-                  ),
-              }
-            : item
-        );
+        return carrinhoAtual.map((item) => {
 
+          if (item.id !== produto.id) {
+            return item;
+          }
+
+          let novaQuantidade =
+            item.quantidade + 1;
+
+          // Se houver estoque definido,
+          // respeita o limite
+          if (
+            produto.estoque > 0 &&
+            novaQuantidade > produto.estoque
+          ) {
+            novaQuantidade = produto.estoque;
+          }
+
+          return {
+            ...item,
+            quantidade: novaQuantidade,
+          };
+
+        });
       }
 
+      // Primeiro item desse produto
       return [
         ...carrinhoAtual,
         {
@@ -57,9 +82,17 @@ function App() {
           quantidade: 1,
         },
       ];
+
     });
+
+    // Abre o carrinho depois de adicionar
+    setCartAberto(true);
   }
 
+
+  // ==========================================
+  // REMOVER PRODUTO
+  // ==========================================
 
   function removerProduto(id) {
 
@@ -71,10 +104,21 @@ function App() {
   }
 
 
-  function alterarQuantidade(id, quantidade) {
+  // ==========================================
+  // ALTERAR QUANTIDADE
+  // ==========================================
 
+  function alterarQuantidade(
+    id,
+    quantidade
+  ) {
+
+    // Se chegar a zero,
+    // remove o produto
     if (quantidade <= 0) {
+
       removerProduto(id);
+
       return;
     }
 
@@ -82,9 +126,16 @@ function App() {
       (item) => item.id === id
     );
 
-    if (!produto) return;
+    if (!produto) {
+      return;
+    }
 
-    if (quantidade > produto.estoque) {
+    // Só limita pelo estoque quando
+    // o estoque for maior que zero
+    if (
+      produto.estoque > 0 &&
+      quantidade > produto.estoque
+    ) {
       quantidade = produto.estoque;
     }
 
@@ -101,8 +152,13 @@ function App() {
   }
 
 
+  // ==========================================
+  // CATEGORIAS
+  // ==========================================
+
   const categorias = [
     "Todos",
+
     ...new Set(
       produtos.map(
         (produto) => produto.categoria
@@ -110,6 +166,10 @@ function App() {
     ),
   ];
 
+
+  // ==========================================
+  // FILTRO DE PRODUTOS
+  // ==========================================
 
   const produtosFiltrados =
     produtos.filter((produto) => {
@@ -121,7 +181,9 @@ function App() {
       const correspondeBusca =
         produto.nome
           .toLowerCase()
-          .includes(busca.toLowerCase());
+          .includes(
+            busca.toLowerCase()
+          );
 
       return (
         pertenceCategoria &&
@@ -129,6 +191,10 @@ function App() {
       );
     });
 
+
+  // ==========================================
+  // QUANTIDADE TOTAL DO CARRINHO
+  // ==========================================
 
   const quantidadeCarrinho =
     carrinho.reduce(
@@ -140,16 +206,33 @@ function App() {
 
   return (
     <>
+
+      {/* =====================================
+          HEADER
+      ===================================== */}
+
       <Header
-        quantidadeCarrinho={quantidadeCarrinho}
+        quantidadeCarrinho={
+          quantidadeCarrinho
+        }
         abrirCarrinho={() =>
           setCartAberto(true)
         }
       />
 
+
       <main>
 
+        {/* ===================================
+            HERO
+        =================================== */}
+
         <Hero />
+
+
+        {/* ===================================
+            CATÁLOGO
+        =================================== */}
 
         <section
           className="catalog"
@@ -173,6 +256,10 @@ function App() {
 
           </div>
 
+
+          {/* =================================
+              CONTROLES
+          ================================= */}
 
           <div className="catalog-controls">
 
@@ -203,7 +290,9 @@ function App() {
 
             <div className="search">
 
-              <span>⌕</span>
+              <span>
+                ⌕
+              </span>
 
               <input
                 type="text"
@@ -219,6 +308,10 @@ function App() {
           </div>
 
 
+          {/* =================================
+              PRODUTOS
+          ================================= */}
+
           {produtosFiltrados.length > 0 ? (
 
             <div className="products-grid">
@@ -229,7 +322,7 @@ function App() {
                   <ProductCard
                     key={produto.id}
                     produto={produto}
-                    adicionarCarrinho={
+                    adicionarAoCarrinho={
                       adicionarCarrinho
                     }
                     abrirProduto={
@@ -261,6 +354,10 @@ function App() {
         </section>
 
 
+        {/* ===================================
+            SOBRE
+        =================================== */}
+
         <section
           className="about"
           id="sobre"
@@ -269,11 +366,14 @@ function App() {
           <div className="about-container">
 
             <div className="about-image">
-      <img
-        src="/perfume-destaque.jpg"
-        alt="Perfume Scond Collection"
-      />
-    </div>
+
+              <img
+                src="/perfume-destaque.jpg"
+                alt="Perfume Scond Collection"
+              />
+
+            </div>
+
 
             <div className="about-content">
 
@@ -288,10 +388,11 @@ function App() {
               </h2>
 
               <p>
-                Na Scond Collection você encontra
-                perfumes selecionados para realçar
-                sua personalidade e tornar cada
-                momento ainda mais especial.
+                Na Scond Collection você
+                encontra perfumes selecionados
+                para realçar sua personalidade
+                e tornar cada momento ainda
+                mais especial.
               </p>
 
               <p>
@@ -309,70 +410,95 @@ function App() {
 
       </main>
 
-<footer>
 
-  <div className="footer-brand">
+      {/* =====================================
+          FOOTER
+      ===================================== */}
 
-    <strong>
-      SCOND COLLECTION
-    </strong>
+      <footer>
 
-    <span>
-      Perfumes que deixam sua marca.
-    </span>
+        <div className="footer-brand">
 
-<a
-  href="https://www.instagram.com/_sco.nd_/"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="instagram-link"
->
-  Instagram · @_sco.nd_
-</a>
+          <strong>
+            SCOND COLLECTION
+          </strong>
 
-<a
-  href="https://wa.me/62993265596"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="whatsapp-float"
-  aria-label="Falar com a Scond Collection pelo WhatsApp"
->
-  <svg
-    viewBox="0 0 32 32"
-    aria-hidden="true"
-  >
-    <path
-      fill="currentColor"
-      d="M19.11 17.24c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26s.98 2.62 1.11 2.8c.14.18 1.92 2.93 4.65 4.11.65.28 1.16.45 1.55.57.65.21 1.24.18 1.71.11.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32z"
-    />
-    <path
-      fill="currentColor"
-      d="M16.02 3.2c-7.07 0-12.8 5.73-12.8 12.8 0 2.26.59 4.38 1.63 6.22L3.1 28.8l6.75-1.72a12.74 12.74 0 0 0 6.17 1.58h.01c7.07 0 12.8-5.73 12.8-12.8S23.09 3.2 16.02 3.2zm0 23.23h-.01a10.4 10.4 0 0 1-5.3-1.44l-.38-.23-4.01 1.02 1.07-3.91-.25-.4a10.42 10.42 0 1 1 8.88 4.96z"
-    />
-  </svg>
-</a>
+          <span>
+            Perfumes que deixam sua marca.
+          </span>
 
-  </div>
 
-  <p>
-    © {new Date().getFullYear()}
-    {" "}Scond Collection.
-    Todos os direitos reservados.
-  </p>
+          <a
+            href="https://www.instagram.com/_sco.nd_/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="instagram-link"
+          >
+            Instagram · @_sco.nd_
+          </a>
 
-</footer>
 
+          {/* =================================
+              WHATSAPP FLUTUANTE
+          ================================= */}
+
+          <a
+            href="https://wa.me/62993265596"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-float"
+            aria-label="Falar com a Scond Collection pelo WhatsApp"
+          >
+
+            <svg
+              viewBox="0 0 32 32"
+              aria-hidden="true"
+            >
+
+              <path
+                fill="currentColor"
+                d="M19.11 17.24c-.27-.14-1.6-.79-1.85-.88-.25-.09-.43-.14-.61.14-.18.27-.7.88-.86 1.06-.16.18-.32.2-.59.07-.27-.14-1.14-.42-2.17-1.34-.8-.71-1.34-1.59-1.5-1.86-.16-.27-.02-.42.12-.56.12-.12.27-.32.41-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.01-.22-.53-.45-.46-.61-.47h-.52c-.18 0-.48.07-.73.34-.25.27-.95.93-.95 2.26s.98 2.62 1.11 2.8c.14.18 1.92 2.93 4.65 4.11.65.28 1.16.45 1.55.57.65.21 1.24.18 1.71.11.52-.08 1.6-.65 1.83-1.28.23-.63.23-1.17.16-1.28-.07-.11-.25-.18-.52-.32z"
+              />
+
+              <path
+                fill="currentColor"
+                d="M16.02 3.2c-7.07 0-12.8 5.73-12.8 12.8 0 2.26.59 4.38 1.63 6.22L3.1 28.8l6.75-1.72a12.74 12.74 0 0 0 6.17 1.58h.01c7.07 0 12.8-5.73 12.8-12.8S23.09 3.2 16.02 3.2zm0 23.23h-.01a10.4 10.4 0 0 1-5.3-1.44l-.38-.23-4.01 1.02 1.07-3.91-.25-.4a10.42 10.42 0 1 1 8.88 4.96z"
+              />
+
+            </svg>
+
+          </a>
+
+        </div>
+
+
+        <p>
+          © {new Date().getFullYear()}
+          {" "}
+          Scond Collection.
+          Todos os direitos reservados.
+        </p>
+
+      </footer>
+
+
+      {/* =====================================
+          CARRINHO
+      ===================================== */}
 
       {cartAberto && (
 
         <Cart
           carrinho={carrinho}
+
           fechar={() =>
             setCartAberto(false)
           }
+
           removerProduto={
             removerProduto
           }
+
           alterarQuantidade={
             alterarQuantidade
           }
@@ -381,16 +507,23 @@ function App() {
       )}
 
 
+      {/* =====================================
+          MODAL DO PRODUTO
+      ===================================== */}
+
       {produtoSelecionado && (
 
         <ProductModal
           produto={produtoSelecionado}
+
           fechar={() =>
             setProdutoSelecionado(null)
           }
+
           adicionarCarrinho={
             adicionarCarrinho
           }
+
         />
 
       )}
