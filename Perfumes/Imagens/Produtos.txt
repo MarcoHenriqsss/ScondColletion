@@ -1,0 +1,59 @@
+Nome: Best Girl
+Descricao: Perfume feminino marcante, elegante e sofisticado.
+Preco: 129.90
+Imagem: Bestgirl.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: 412 VIP
+Descricao: Fragrância envolvente e moderna para quem gosta de presença.
+Preco: 119.90
+Imagem: 412vip.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: Olimpica
+Descricao: Perfume masculino intenso e sofisticado.
+Preco: 139.90
+Imagem: Olimpica.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: La Bella Woman
+Descricao: Perfume Feminino intenso e sofisticado.
+Preco: 139.90
+Imagem: Labella.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: Khloê
+Descricao: Perfume Feminino intenso e sofisticado.
+Preco: 139.90
+Imagem: Khloe.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: Glamourosa
+Descricao: Perfume Feminino intenso e sofisticado.
+Preco: 139.90
+Imagem: Glamourosa.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: Coco
+Descricao: Perfume Feminino intenso e sofisticado.
+Preco: 139.90
+Imagem: Coco.jpeg
+Categoria: Feminino
+Estoque: 3
+
+Nome: Amber Monarch
+Descricao: Perfume Feminino intenso e sofisticado.
+Preco: 139.90
+Imagem: Ambermonarch.jpeg
+Categoria: Feminino
+Estoque: 3
+
+
+
+
