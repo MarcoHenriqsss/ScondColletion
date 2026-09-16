@@ -26,10 +26,14 @@ function ProductCard({
         className="product-image"
         onClick={() => abrirProduto(produto)}
       >
-        <img
-          src={`/Perfumes/Imagens/${produto.imagem}`}
-          alt={produto.nome}
-        />
+<img
+  src={
+    produto.imagem?.startsWith("http")
+      ? produto.imagem
+      : `/Perfumes/Imagens/${produto.imagem}`
+  }
+  alt={produto.nome}
+/>
       </div>
 
       <div className="product-info">

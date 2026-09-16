@@ -5,12 +5,43 @@ import Hero from "./components/Hero";
 import ProductCard from "./components/ProductCard";
 import ProductModal from "./components/ProductModal";
 import Cart from "./components/Cart";
-
 import produtos from "./data/produtos";
+import { supabase } from "./lib/supabase";
 
 function App() {
 
+  const [produtosSupabase, setProdutosSupabase] = useState([]);
+
   const [carrinho, setCarrinho] = useState([]);
+
+  React.useEffect(() => {
+ async function carregarProdutos() {
+    const { data, error } = await supabase
+      .from("produtos")
+      .select("*")
+      .eq("ativo", true);
+
+    if (error) {
+      console.error("Erro ao carregar produtos:", error);
+      return;
+    }
+
+    const produtosOrdenados = (data || []).sort(
+      (a, b) =>
+        a.nome.localeCompare(
+          b.nome,
+          "pt-BR",
+          {
+            sensitivity: "base",
+          }
+        )
+    );
+
+    setProdutosSupabase(produtosOrdenados);
+  }
+
+  carregarProdutos();
+}, []);
 
   const [categoria, setCategoria] =
     useState("Todos");
@@ -122,7 +153,7 @@ function App() {
       return;
     }
 
-    const produto = produtos.find(
+    const produto = produtosSupabase.find(
       (item) => item.id === id
     );
 
@@ -160,7 +191,7 @@ function App() {
     "Todos",
 
     ...new Set(
-      produtos.map(
+      produtosSupabase.map(
         (produto) => produto.categoria
       )
     ),
@@ -172,7 +203,7 @@ function App() {
   // ==========================================
 
   const produtosFiltrados =
-    produtos.filter((produto) => {
+    produtosSupabase.filter((produto) => {
 
       const pertenceCategoria =
         categoria === "Todos" ||
