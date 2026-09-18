@@ -46,21 +46,9 @@ function ProductCard({
           {produto.nome}
         </h3>
 
-        <div className="product-description">
-  <p>
-    {produto.descricao}
-  </p>
-
-  {produto.descricao?.length > 100 && (
-    <button
-      type="button"
-      className="product-more"
-      onClick={() => abrirProduto(produto)}
-    >
-      Saiba mais...
-    </button>
-  )}
-</div>
+        <p className="product-description">
+          {produto.descricao}
+        </p>
 
         <div className="product-bottom">
 
