@@ -19,9 +19,13 @@ function ProductModal({ produto, fechar, adicionarCarrinho }) {
 
         <div className="modal-image">
           <img
-            src={`/Perfumes/Imagens/${produto.imagem}`}
-            alt={produto.nome}
-          />
+  src={
+    produto.imagem?.startsWith("http")
+      ? produto.imagem
+      : `/Perfumes/Imagens/${produto.imagem}`
+  }
+  alt={produto.nome}
+/>
         </div>
 
         <div className="modal-content">
